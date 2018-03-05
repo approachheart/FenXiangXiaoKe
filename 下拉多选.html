@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/vue.min.js"></script>
+    <style type="text/css">
+        #searchshow {
+            height: 28px;
+            width: 100%;
+            border: 1px solid #C2C2C2;
+            padding: 2px 0px;
+            border-radius: 5px;
+        }
+
+        #showopt {
+            float: left;
+
+        }
+
+        #btn {
+            float: right;
+            padding: 2px 0px;
+            margin-right: 6px;
+
+        }
+
+        #btn button {
+            background-color: white;
+            color: #C2C2C2;
+            border-radius: 50%;
+            height: 18px;
+            width: 18px;
+            border: 1px solid #C2C2C2;
+            font-size: 18px;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        #btn button span {
+            position: absolute;
+            position: absolute;
+            top: -5px;
+            left: 1px;
+        }
+
+        #showopt .opt {
+            background-color: #2C72DE;
+            height: 28px;
+            color: white;
+            display: block;
+            float: left;
+            font-size: 16px;
+            line-height: 28px;
+            padding: 0 8px;
+            border-radius: 26px;
+            margin-left: 6px;
+        }
+
+        #showopt .opt a {
+            font-weight: bold;
+            margin-left: 6px;
+        }
+
+        .select-dropdown {
+            border: 1px solid #C2C2C2;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .select-dropdown .searchtxt {
+            height: 32px;
+            background: #F5F5F5;
+            padding: 5px;
+
+        }
+
+        .select-dropdown .searchtxt .searchinput {
+            width: 80%;
+            border-radius: 20px;
+            height: 28px;
+            border: 1px solid #C2C2C2;
+            background-color: white;
+            margin: 0 auto;
+        }
+
+        .select-dropdown .searchtxt .searchinput .bigger {
+            height: 26px;
+            width: 26px;
+            background-image: url("img/bigger.png");
+            background-size: 26px 26px;
+            margin-left: 6px;
+            float: left;
+        }
+
+        .select-dropdown .searchtxt .searchinput input {
+            border: none;
+            height: 26px;
+            float: left;
+            margin-left: 12px;
+
+        }
+
+        .select-dropdown #searchscroll {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .select-dropdown #searchscroll .searchitems {
+            padding: 6px 0;
+            font-size: 16px;
+        }
+        .active{
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="all">
+    <div id="searchshow">
+        <div class="optbox">
+        <div id="showopt" v-model="checkedNames" v-for="(checkedName,index) in checkedNames">
+            <opt v-bind:msg="checkedName" v-bind:ind="index"></opt>
+        </div>
+        </div>
+        <div id="btn" v-on:click="openoff">
+            <button><span>+</span></button>
+        </div>
+    </div>
+    <div class="select-dropdown" v-bind:class="{ active: isActive }" >
+        <div class="searchtxt">
+            <div class="searchinput">
+                <div class="bigger"></div>
+                <input type="text" placeholder="搜索" v-model="searchText">
+            </div>
+        </div>
+        <div id="searchscroll">
+
+            <div v-for="option in findresult " 　class="searchitems">
+                <input type="checkbox" v-bind:id="option.value" v-bind:value="option.show" v-model="checkedNames">
+                <label v-bind:for="option.value">{{option.show }}</label>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    Vue.component('opt', {
+        props: ['msg', 'ind'],
+        template: '<span class="opt">{{msg}}<a v-on:click="all.deleteopt(ind)">×</a></span>'
+    })
+    var all = new Vue({
+        el: '#all',
+        data: {
+            opt: '正常',
+            options: [
+                {value: "1", show: "变更中"},
+                {value: "2", show: "未生效"},
+                {value: "3", show: "作废"},
+                {value: "4", show: "正常"},
+                {value: "5", show: "审核中"}
+            ],
+            isActive:true,
+            checkedNames: [],
+            searchText: "",
+            findresult:[
+                {value: "1", show: "变更中"},
+                {value: "2", show: "未生效"},
+                {value: "3", show: "作废"},
+                {value: "4", show: "正常"},
+                {value: "5", show: "审核中"}
+            ]
+        },
+
+        methods: {
+            deleteopt: function (ind) {
+                this.checkedNames.splice(ind, 1);
+            },
+            openoff:function(){
+                this.isActive=!this.isActive;
+            }
+        },
+        watch :{
+            searchText:function(){
+                this.findit;
+            }
+        },
+        computed: {
+            findit: function () {
+                var searchRegex = new RegExp(this.searchText, 'i');
+                if (searchRegex) {
+                    var count=0;
+                    var json = {};
+                    for (var i = 0; i < this.options.length; i++) {
+                        var item = this.options[i].show.match(searchRegex);
+                        if (item) {
+                            json[count]=this.options[i];
+                            count++;
+                        }
+                    }
+                    this.findresult=json;
+                }else{
+                    this.findresult= this.options;
+                }
+            }
+        }
+    })
+
+
+</script>
+
+</body>
+</html>
